@@ -30,18 +30,40 @@
 (require 'nano-theme)
 (require 'svg-lib)
 
-(defvar nano-toolbar-prompt-face 'nano-strong)
 
-;; You might need to change these faces if you're not using nano-theme
-(defvar nano-toolbar-button-faces '((0 . nano-default)     ;; Inactive
-                                    (1 . nano-faded-i)     ;; Pre-selected
-                                    (2 . nano-default-i))) ;; Active
+(defgroup nano-toolbar nil
+  "N Λ N O Toolbar"
+  :group 'nano)
 
-(defvar nano-toolbar-space-top 0.20
-  "Empty top space (purely aesthetic)")
+
+(defcustom nano-toolbar-prompt-face 'nano-strong
+  "Face for the prompt"
+  :group 'nano-toolbar
+  :type 'face)
+
+(defcustom nano-toolbar-button-faces
+  '((disabled . nano-faded-i)     
+    (default  . nano-default)
+    (hover    . nano-faded-i)
+    (active   . nano-default-i))
+  "Faces for the four possible button states"
+  :group 'nano-toolbar
+  :type '(list (cons (const :tag "Disabled" disabled) face)
+               (cons (const :tag "Default"  default) face)
+               (cons (const :tag "Hover"    hover) face)
+               (cons (const :tag "Active"   active) face)))
+
+(defcustom nano-toolbar-space-top 0.20
+  "Top spacing (purely aesthetic)"
+  :group 'nano-toolbar
+  :type 'float)
   
-(defvar nano-toolbar-space-bottom  0.25
-  "Empty bottom space (purely aesthetic)")
+(defcustom nano-toolbar-space-bottom 0.25
+  "Bottom spacing (purely aesthetic)"
+  :group 'nano-toolbar
+  :type 'float)
+
+
 
 (defvar nano-toolbar--buttons nil
   "List of buttons as a cons cell (LABEL . STATE)")
@@ -84,12 +106,12 @@
   (setq nano-toolbar--index-pointer nil)
   (let ((index 0))
     (dolist (button nano-toolbar--buttons)
-      (when (not (equal (cdr button) 2))
+      (when (not (equal (cdr button) 'active))
         (if (equal (car button) label)
             (progn
-              (setcdr button 1)
+              (setcdr button 'hover)
               (setq nano-toolbar--index-pointer index))
-          (setcdr button 0)))
+          (setcdr button 'default)))
       (setq index (+ index 1))))
     (force-mode-line-update))
 
@@ -99,8 +121,8 @@
 
   (dolist (button nano-toolbar--buttons)
     (if (equal (car button) label)
-        (setcdr button 2)
-      (setcdr button 0)))
+        (setcdr button 'active)
+      (setcdr button 'default)))
   (force-mode-line-update))
 
 (defun nano-toolbar--mouse-activate ()
@@ -145,7 +167,7 @@
   "Validate current button"
   (throw 'break nil))
 
-(defun nano-toolbar-make (prompt buttons)
+(defun nano-toolbar (prompt buttons)
   "Create a toolbar in the header line using given PROMPT and BUTTONS description"
   
   (setq nano-toolbar--buttons buttons)
@@ -191,15 +213,14 @@
   ;; Read selection
   (catch 'break
     (dolist (button nano-toolbar--buttons)
-      (if (equal (cdr button) 2)
+      (if (equal (cdr button) 'active)
           (throw 'break (car button))))))
 
 
-
-(nano-toolbar-make " SELECT" '(("UNREAD"    . 2)
-                               ("TODO"      . 0)
-                               ("INBOX"     . 0)
-                               ("TODAY"     . 0)
-                               ("FLAGGED"   . 0)
-                               ("YESTERDAY" . 0)
-                               ("LAST WEEK" . 0)))
+(nano-toolbar " SELECT" '(("UNREAD"    . active)
+                          ("TODO"      . default)
+                          ("INBOX"     . default)
+                          ("TODAY"     . default)
+                          ("FLAGGED"   . default)
+                          ("YESTERDAY" . default)
+                          ("LAST WEEK" . default)))
