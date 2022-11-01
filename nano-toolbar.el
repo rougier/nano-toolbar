@@ -25,6 +25,18 @@
 
 ;;; Commentary:
 ;;
+;; Usage example:
+;;
+;; (nano-toolbar " SELECT" '(("UNREAD"    . active)
+;;                           ("TODO"      . default)
+;;                           ("INBOX"     . default)
+;;                           ("TODAY"     . default)
+;;                           ("FLAGGED"   . default)
+;;                           ("YESTERDAY" . default)
+;;                           ("LAST WEEK" . default)))
+;;
+;; If an entry is selected, the corresponding string is returned
+;;
 
 ;;; Code:
 (require 'nano-theme)
@@ -68,7 +80,7 @@
 (defvar nano-toolbar--buttons nil
   "List of buttons as a cons cell (LABEL . STATE)")
 
-(defvar nano-toolbar--index-current nil
+(defvar nano-toolbar--index-current 0
   "Index of the current selected button")
 
 (defvar nano-toolbar--index-pointer nil
@@ -171,7 +183,7 @@
   "Create a toolbar in the header line using given PROMPT and BUTTONS description"
   
   (setq nano-toolbar--buttons buttons)
-  (setq nano-toolbar--index-current 0)
+  ;; (setq nano-toolbar--index-current 0)
   (setq nano-toolbar--index-mouse nil)
   (setq saved-header-line-format header-line-format)
   
@@ -216,11 +228,3 @@
       (if (equal (cdr button) 'active)
           (throw 'break (car button))))))
 
-
-(nano-toolbar " SELECT" '(("UNREAD"    . active)
-                          ("TODO"      . default)
-                          ("INBOX"     . default)
-                          ("TODAY"     . default)
-                          ("FLAGGED"   . default)
-                          ("YESTERDAY" . default)
-                          ("LAST WEEK" . default)))
